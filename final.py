@@ -3,6 +3,18 @@ import pandas as pd
 from docx import Document
 import tkinter as tk
 from tkinter import ttk, messagebox, font
+import platform
+import subprocess
+
+# Function to open the directory
+def open_directory(path):
+    """Open the directory containing the generated file."""
+    if platform.system() == "Windows":
+        os.startfile(path)  # Open directory on Windows
+    elif platform.system() == "Darwin":
+        subprocess.Popen(["open", path])  # Open directory on macOS
+    else:
+        subprocess.Popen(["xdg-open", path])  # Open directory on Linux
 
 # Function to fill the Word template
 def fill_template(template_path, data_row, output_path):
@@ -25,6 +37,7 @@ def fill_template(template_path, data_row, output_path):
     
     doc.save(output_path)
     messagebox.showinfo("Success", f"Document saved to {output_path}")
+    open_directory(os.path.dirname(output_path))  # Open the directory after saving
 
 # Function to generate a document for the selected row
 def generate_release_document():
@@ -71,11 +84,12 @@ def search_rows():
     listbox.delete(0, tk.END)
     for index, row in df[filtered_rows].iterrows():
             listbox.insert(tk.END, " - ".join(map(str, row.values)))
+
 # path = ''
 path = 'Desktop/print/'
 
 # Load Excel data
-excel_file = path + 'sample.xlsx'
+excel_file = path + 'data.xlsx'
 baptisim_template_m = path + 'baptisim_template_m.docx'  
 baptisim_template_f = path +'baptisim_template_f.docx'  
 release_situation_m = path +'release_situation_m.docx'  
@@ -84,7 +98,6 @@ output_directory = path + 'output_docs'
 
 if not os.path.exists(excel_file):
     raise FileNotFoundError(f"Excel file not found: {excel_file}")
-
 
 if not os.path.exists(output_directory):
     os.makedirs(output_directory)
@@ -102,20 +115,38 @@ search_entry = ttk.Entry(root, textvariable=search_var, width=50)
 search_entry.pack(pady=10)
 search_entry.bind("<KeyRelease>", lambda event: search_rows())
 
-# Listbox to display rows
-custom_font = font.Font(family="Traditional Arabic", size=2)  # Adjust size and font family as needed
+# Configure font for the Listbox
+custom_font = font.Font(family="Arial", size=14)  # Adjust size and font family as needed
 
-listbox = tk.Listbox(root, width=100, height=40, font=custom_font, justify="right")
-listbox.pack(pady=20)
+# Create a frame to hold the Listbox and Scrollbar
+frame = tk.Frame(root)
+frame.pack(pady=10, fill=tk.BOTH, expand=True)
+
+# Add a vertical scrollbar
+scrollbar = ttk.Scrollbar(frame, orient=tk.VERTICAL)
+scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+# Listbox to display rows
+listbox = tk.Listbox(frame, width=100, height=20, font=custom_font, justify="right", yscrollcommand=scrollbar.set)
+listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+# Link the scrollbar to the Listbox
+scrollbar.config(command=listbox.yview)
 
 # Populate the listbox with all rows initially
 for index, row in df.iterrows():
     listbox.insert(tk.END, " - ".join(map(str, row.values)))
 
-# Generate document button
-generate_button = ttk.Button(root, text="اطلاق حال", command=generate_release_document)
-generate_button.pack(pady=10)
-generate_button = ttk.Button(root, text="ورقة معمودية", command=generate_baptisim_document)
-generate_button.pack(pady=10)
+# Create a frame for the buttons
+button_frame = tk.Frame(root)
+button_frame.pack(pady=10)
+
+# Generate document buttons
+generate_release_button = ttk.Button(button_frame, text="اطلاق حال", command=generate_release_document)
+generate_release_button.pack(side=tk.LEFT, padx=5)
+
+generate_baptisim_button = ttk.Button(button_frame, text="ورقة معمودية", command=generate_baptisim_document)
+generate_baptisim_button.pack(side=tk.LEFT, padx=5)
+
 # Run the Tkinter event loop
 root.mainloop()
