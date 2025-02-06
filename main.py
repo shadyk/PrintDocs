@@ -85,8 +85,8 @@ def search_rows():
     for index, row in df[filtered_rows].iterrows():
             listbox.insert(tk.END, " - ".join(map(str, row.values)))
 
-# path = ''
-path = 'Desktop/print/'
+path = ''
+# path = 'Desktop/print/'
 
 # Load Excel data
 excel_file = path + 'data.xlsx'
@@ -116,7 +116,7 @@ search_entry.pack(pady=10)
 search_entry.bind("<KeyRelease>", lambda event: search_rows())
 
 # Configure font for the Listbox
-custom_font = font.Font(family="Arial", size=14)  # Adjust size and font family as needed
+custom_font = font.Font(family="Traditional Arabic", size=20)  # Adjust size and font family as needed
 
 # Create a frame to hold the Listbox and Scrollbar
 frame = tk.Frame(root)
