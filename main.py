@@ -5,8 +5,25 @@ import tkinter as tk
 from tkinter import ttk, messagebox, font
 import platform
 import subprocess
+from datetime import datetime
+from babel.dates import format_date
 
-# Function to open the directory
+def convert_to_eastern_arabic(number):
+    eastern_arabic_digits = {
+        "0": "٠", "1": "١", "2": "٢", "3": "٣", "4": "٤",
+        "5": "٥", "6": "٦", "7": "٧", "8": "٨", "9": "٩"
+    }
+    return "".join(eastern_arabic_digits[digit] for digit in str(number))
+
+def replace_text_in_paragraph(paragraph, old_text, new_text):
+    """Replace text even if it is split across multiple runs."""
+    full_text = "".join(run.text for run in paragraph.runs)  # Combine all runs
+    if old_text in full_text:
+        full_text = full_text.replace(old_text, new_text)  # Replace text
+        for run in paragraph.runs:
+            run.text = ""  # Clear all runs
+        paragraph.add_run(full_text)  # Add updated text as a single run
+
 def open_directory(path):
     """Open the directory containing the generated file."""
     if platform.system() == "Windows":
@@ -18,7 +35,22 @@ def open_directory(path):
 
 # Function to fill the Word template
 def fill_template(template_path, data_row, output_path):
-    """Fill the Word document template with data from the selected row."""
+
+    arabic_months = {
+        "January": "كانون الثاني",
+        "February": "شباط",
+        "March": "آذار",
+        "April": "نيسان",
+        "May": "أيار",
+        "June": "حزيران",
+        "July": "تموز",
+        "August": "آب",
+        "September": "أيلول",
+        "October": "تشرين الأول",
+        "November": "تشرين الثاني",
+        "December": "كانون الأول"
+    }
+            
     if not os.path.exists(template_path):
         messagebox.showerror("Error", f"Template file not found: {template_path}")
         return
@@ -34,6 +66,17 @@ def fill_template(template_path, data_row, output_path):
         for paragraph in doc.paragraphs:
             if f'{{{key}}}' in paragraph.text:
                 paragraph.text = paragraph.text.replace(f'{{{key}}}', str(value))
+    
+    today = datetime.today()
+
+    day = convert_to_eastern_arabic(today.day)  # Convert day to Eastern Arabic
+    month_name = arabic_months[today.strftime("%B")]
+    year = convert_to_eastern_arabic(today.year)
+    arabic_date = f"{day} {month_name} {year}" 
+
+    for paragraph in doc.paragraphs:
+        replace_text_in_paragraph(paragraph, "Today", arabic_date)
+
     
     doc.save(output_path)
     messagebox.showinfo("Success", f"Document saved to {output_path}")
