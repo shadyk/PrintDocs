@@ -3,53 +3,15 @@ import pandas as pd
 from docx import Document
 import tkinter as tk
 from tkinter import ttk, messagebox, font
-import platform
-import subprocess
+from helpers import convert_to_eastern_arabic
+from helpers import replace_text_in_paragraph
+from helpers import open_directory
+from helpers import arabic_months
 from datetime import datetime
 from babel.dates import format_date
 
-def convert_to_eastern_arabic(number):
-    eastern_arabic_digits = {
-        "0": "٠", "1": "١", "2": "٢", "3": "٣", "4": "٤",
-        "5": "٥", "6": "٦", "7": "٧", "8": "٨", "9": "٩"
-    }
-    return "".join(eastern_arabic_digits[digit] for digit in str(number))
-
-def replace_text_in_paragraph(paragraph, old_text, new_text):
-    """Replace text even if it is split across multiple runs."""
-    full_text = "".join(run.text for run in paragraph.runs)  # Combine all runs
-    if old_text in full_text:
-        full_text = full_text.replace(old_text, new_text)  # Replace text
-        for run in paragraph.runs:
-            run.text = ""  # Clear all runs
-        paragraph.add_run(full_text)  # Add updated text as a single run
-
-def open_directory(path):
-    """Open the directory containing the generated file."""
-    if platform.system() == "Windows":
-        os.startfile(path)  # Open directory on Windows
-    elif platform.system() == "Darwin":
-        subprocess.Popen(["open", path])  # Open directory on macOS
-    else:
-        subprocess.Popen(["xdg-open", path])  # Open directory on Linux
-
 # Function to fill the Word template
 def fill_template(template_path, data_row, output_path):
-
-    arabic_months = {
-        "January": "كانون الثاني",
-        "February": "شباط",
-        "March": "آذار",
-        "April": "نيسان",
-        "May": "أيار",
-        "June": "حزيران",
-        "July": "تموز",
-        "August": "آب",
-        "September": "أيلول",
-        "October": "تشرين الأول",
-        "November": "تشرين الثاني",
-        "December": "كانون الأول"
-    }
             
     if not os.path.exists(template_path):
         messagebox.showerror("Error", f"Template file not found: {template_path}")
@@ -128,16 +90,13 @@ def search_rows():
     for index, row in df[filtered_rows].iterrows():
             listbox.insert(tk.END, " - ".join(map(str, row.values)))
 
-path = ''
-# path = 'Desktop/print/'
-
 # Load Excel data
-excel_file = path + 'data.xlsx'
-baptisim_template_m = path + 'baptisim_template_m.docx'  
-baptisim_template_f = path +'baptisim_template_f.docx'  
-release_situation_m = path +'release_situation_m.docx'  
-release_situation_f = path + 'release_situation_f.docx'  
-output_directory = path + 'output_docs'
+excel_file = 'data.xlsx'
+baptisim_template_m = 'baptisim_template_m.docx'  
+baptisim_template_f ='baptisim_template_f.docx'  
+release_situation_m ='release_situation_m.docx'  
+release_situation_f = 'release_situation_f.docx'  
+output_directory = 'output_docs'
 
 if not os.path.exists(excel_file):
     raise FileNotFoundError(f"Excel file not found: {excel_file}")
