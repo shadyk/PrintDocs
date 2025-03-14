@@ -6,11 +6,11 @@ jobs:
     runs-on: ${{ matrix.os }}  # Runs on multiple operating systems
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]  # Defines the OSes to build for
+        os: [windows-latest, macos-latest]  # Defines the OSes to build for
     steps:
       # Check out the repository
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4  # Updated to v4
 
       # Set up Python
       - name: Set up Python
@@ -27,11 +27,11 @@ jobs:
       # Build the executable using PyInstaller
       - name: Build executable
         run: |
-          pyinstaller --onefile main.py  # Replace 'main.py' with your script's name
+          pyinstaller --onefile main.py
 
       # Upload the built executable as an artifact
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4  # Updated to v4
         with:
           name: ${{ runner.os }}-executable  # Names the artifact based on the OS
           path: dist/  # Path to the folder containing the built executable
