@@ -37,33 +37,31 @@ def convert_to_eastern_arabic(number):
     return "".join(eastern_arabic_digits[digit] for digit in str(number))
 
 def replace_text_in_paragraph(paragraph, old_text, new_text):
-    """Replace text even if it is split across multiple runs."""
-    full_text = "".join(run.text for run in paragraph.runs)  # Combine all runs
+    full_text = "".join(run.text for run in paragraph.runs)
     if old_text in full_text:
-        full_text = full_text.replace(old_text, new_text)  # Replace text
+        full_text = full_text.replace(old_text, new_text)
         for run in paragraph.runs:
-            run.text = ""  # Clear all runs
-        paragraph.add_run(full_text)  # Add updated text as a single run
+            run.text = ""
+        paragraph.add_run(full_text)
 
 def open_directory(path):
-    """Open the directory containing the generated file."""
     if platform.system() == "Windows":
-        os.startfile(path)  # Open directory on Windows
+        os.startfile(path)
     elif platform.system() == "Darwin":
-        subprocess.Popen(["open", path])  # Open directory on macOS
+        subprocess.Popen(["open", path])
     else:
-        subprocess.Popen(["xdg-open", path])  # Open directory on Linux
+        subprocess.Popen(["xdg-open", path])
 # Function to fill the Word template
 def fill_template(template_path, data_row, output_path):
             
     if not os.path.exists(template_path):
-        messagebox.showerror("Error", f"Template file not found: {template_path}")
+        messagebox.showerror("Error", f"الملف غير موجود: {template_path}")
         return
 
     try:
         doc = Document(template_path)
     except Exception as e:
-        messagebox.showerror("Error", f"Error loading document: {e}")
+        messagebox.showerror("Error", f"لم استطع فتح الملف: {e}")
         return
 
     for key, value in data_row.items():
@@ -74,7 +72,7 @@ def fill_template(template_path, data_row, output_path):
     
     today = datetime.today()
 
-    day = convert_to_eastern_arabic(today.day)  # Convert day to Eastern Arabic
+    day = convert_to_eastern_arabic(today.day)
     month_name = arabic_months[today.strftime("%B")]
     year = convert_to_eastern_arabic(today.year)
     arabic_date = f"{day} {month_name} {year}" 
@@ -84,14 +82,14 @@ def fill_template(template_path, data_row, output_path):
 
     
     doc.save(output_path)
-    messagebox.showinfo("Success", f"Document saved to {output_path}")
-    open_directory(os.path.dirname(output_path))  # Open the directory after saving
+    messagebox.showinfo("Success", f"حفظ الملف :  {output_path}")
+    open_directory(os.path.dirname(output_path))
 
 # Function to generate a document for the selected row
 def generate_release_document():
     selected_index = listbox.curselection()
     if not selected_index:
-        messagebox.showwarning("Warning", "Please select a row!")
+        messagebox.showwarning("تذكير", "اختار اسم قبل ")
         return
     selectedTemplate = release_situation_f
     selected_row = df.iloc[selected_index[0]]
@@ -99,7 +97,7 @@ def generate_release_document():
     for key, value in selected_row.items():
        key = key.strip()
        if key == 'Gender':
-           if value == 'M':
+           if value == 'M' or value == 'm':
                selectedTemplate = release_situation_m
 
     fill_template(selectedTemplate, selected_row, output_path)
@@ -142,7 +140,7 @@ release_situation_f = 'release_situation_f.docx'
 output_directory = 'output_docs'
 
 if not os.path.exists(excel_file):
-    raise FileNotFoundError(f"Excel file not found: {excel_file}")
+    raise FileNotFoundError(f"الملف غير موجود: {excel_file}")
 
 if not os.path.exists(output_directory):
     os.makedirs(output_directory)
@@ -161,7 +159,7 @@ search_entry.pack(pady=10)
 search_entry.bind("<KeyRelease>", lambda event: search_rows())
 
 # Configure font for the Listbox
-custom_font = font.Font(family="Traditional Arabic", size=20)  # Adjust size and font family as needed
+custom_font = font.Font(family="Traditional Arabic", size=20)
 
 # Create a frame to hold the Listbox and Scrollbar
 frame = tk.Frame(root)
