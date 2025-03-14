@@ -27,7 +27,7 @@ jobs:
       # Build the executable using PyInstaller
       - name: Build executable
         run: |
-          pyinstaller --onefile main.py
+          pyinstaller --onefile --add-data "data.xlsx:." --add-data "baptisim_template_m.docx:." --add-data "baptisim_template_f.docx:." --add-data "release_situation_m.docx:." --add-data "release_situation_f.docx:." main.py
 
       # Upload the built executable as an artifact
       - name: Upload artifact
